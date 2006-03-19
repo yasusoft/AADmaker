@@ -76,12 +76,16 @@ __published:	// IDE 管理のコンポーネント
         TTabSheet *TabError;
         TMemo *MemoError;
         TPanel *PanelError;
+        TMenuItem *KeyImportCSV;
+        TMenuItem *KeyImportPBX;
+        TMenuItem *KeyExportCSV;
+        TMenuItem *KeyExportPBX;
         void __fastcall KeyExitClick(TObject *Sender);
         void __fastcall KeyNewClick(TObject *Sender);
         void __fastcall KeyOpenClick(TObject *Sender);
         void __fastcall KeySaveClick(TObject *Sender);
-        void __fastcall KeyImportClick(TObject *Sender);
-        void __fastcall KeyExportClick(TObject *Sender);
+        void __fastcall KeyImportCSVClick(TObject *Sender);
+        void __fastcall KeyExportCSVClick(TObject *Sender);
         void __fastcall ButtonNowClick(TObject *Sender);
         void __fastcall FormCreate(TObject *Sender);
         void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
@@ -105,6 +109,8 @@ __published:	// IDE 管理のコンポーネント
         void __fastcall KeyDelMultiClick(TObject *Sender);
         void __fastcall KeyBarAddClick(TObject *Sender);
         void __fastcall KeyBarChangeClick(TObject *Sender);
+        void __fastcall KeyImportPBXClick(TObject *Sender);
+        void __fastcall KeyExportPBXClick(TObject *Sender);
 private:	// ユーザー宣言
         bool modify;
         AnsiString findkey;

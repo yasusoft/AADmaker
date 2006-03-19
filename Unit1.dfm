@@ -9,7 +9,7 @@ object Form1: TForm1
   Font.Charset = SHIFTJIS_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
-  Font.Name = 'ＭＳ Ｐゴシック'
+  Font.Name = #65325#65331' '#65328#12468#12471#12483#12463
   Font.Style = []
   Menu = MainMenu
   OldCreateOrder = False
@@ -17,6 +17,9 @@ object Form1: TForm1
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  DesignSize = (
+    450
+    300)
   PixelsPerInch = 96
   TextHeight = 12
   object PageControl: TPageControl
@@ -27,11 +30,12 @@ object Form1: TForm1
     ActivePage = TabVocabulary
     Align = alClient
     MultiLine = True
+    TabIndex = 0
     TabOrder = 0
     TabPosition = tpBottom
     OnChange = PageControlChange
     object TabVocabulary: TTabSheet
-      Caption = '単語の一覧'
+      Caption = #21336#35486#12398#19968#35239
       object PanelTop: TPanel
         Left = 0
         Top = 0
@@ -40,12 +44,15 @@ object Form1: TForm1
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 0
+        DesignSize = (
+          442
+          25)
         object LabelYomi: TLabel
           Left = 5
           Top = 5
           Width = 12
           Height = 12
-          Caption = '読'
+          Caption = #35501
           FocusControl = EditYomi
         end
         object LabelGoku: TLabel
@@ -53,7 +60,7 @@ object Form1: TForm1
           Top = 5
           Width = 12
           Height = 12
-          Caption = '語'
+          Caption = #35486
           FocusControl = EditGoku
         end
         object LabelKind: TLabel
@@ -62,7 +69,7 @@ object Form1: TForm1
           Width = 12
           Height = 12
           Anchors = [akTop, akRight]
-          Caption = '種'
+          Caption = #31278
           FocusControl = ComboKind
         end
         object EditYomi: TEdit
@@ -73,7 +80,7 @@ object Form1: TForm1
           Font.Charset = SHIFTJIS_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
-          Font.Name = 'ＭＳ ゴシック'
+          Font.Name = #65325#65331' '#12468#12471#12483#12463
           Font.Style = []
           MaxLength = 20
           ParentFont = False
@@ -88,7 +95,7 @@ object Form1: TForm1
           Font.Charset = SHIFTJIS_CHARSET
           Font.Color = clWindowText
           Font.Height = -12
-          Font.Name = 'ＭＳ ゴシック'
+          Font.Name = #65325#65331' '#12468#12471#12483#12463
           Font.Style = []
           MaxLength = 50
           ParentFont = False
@@ -104,23 +111,23 @@ object Form1: TForm1
           ItemHeight = 12
           TabOrder = 2
           Items.Strings = (
-            '名詞'
+            #21517#35422
             '1'
-            '人名'
-            '固有名詞'
-            '社名'
+            #20154#21517
+            #22266#26377#21517#35422
+            #31038#21517
             '5'
             '6'
             '7'
             '8'
-            '定型文'
-            '顔文字'
+            #23450#22411#25991
+            #38996#25991#23383
             '11'
             '12'
             '13'
             '14'
-            '接尾語'
-            '数字'
+            #25509#23614#35486
+            #25968#23383
             '17'
             '18'
             '19'
@@ -143,7 +150,7 @@ object Form1: TForm1
           Width = 40
           Height = 20
           Anchors = [akTop, akRight]
-          Caption = '追加'
+          Caption = #36861#21152
           Default = True
           TabOrder = 3
           OnClick = ButtonAddClick
@@ -154,7 +161,7 @@ object Form1: TForm1
           Width = 40
           Height = 20
           Anchors = [akTop, akRight]
-          Caption = '変更'
+          Caption = #22793#26356
           TabOrder = 4
           OnClick = ButtonChangeClick
         end
@@ -163,26 +170,26 @@ object Form1: TForm1
         Left = 0
         Top = 25
         Width = 442
-        Height = 248
+        Height = 250
         Align = alClient
         Columns = <
           item
-            Caption = '読み'
+            Caption = #35501#12415
             Width = 105
           end
           item
-            Caption = '語句'
+            Caption = #35486#21477
             Width = 200
           end
           item
-            Caption = '種類'
+            Caption = #31278#39006
             Width = 60
           end>
         ColumnClick = False
         Font.Charset = SHIFTJIS_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'ＭＳ ゴシック'
+        Font.Name = #65325#65331' '#12468#12471#12483#12463
         Font.Style = []
         GridLines = True
         HideSelection = False
@@ -199,8 +206,11 @@ object Form1: TForm1
       end
     end
     object TabInfo: TTabSheet
-      Caption = '辞書の情報'
+      Caption = #36766#26360#12398#24773#22577
       ImageIndex = 1
+      DesignSize = (
+        442
+        275)
       object LabelAuthor: TLabel
         Left = 5
         Top = 40
@@ -208,7 +218,7 @@ object Form1: TForm1
         Height = 12
         Alignment = taCenter
         AutoSize = False
-        Caption = '作者名(&A)'
+        Caption = #20316#32773#21517'(&A)'
         FocusControl = EditAuthor
       end
       object LabelName: TLabel
@@ -218,7 +228,7 @@ object Form1: TForm1
         Height = 12
         Alignment = taCenter
         AutoSize = False
-        Caption = '辞書名(&N)'
+        Caption = #36766#26360#21517'(&N)'
         FocusControl = EditName
       end
       object LabelDate: TLabel
@@ -228,7 +238,7 @@ object Form1: TForm1
         Height = 12
         Alignment = taCenter
         AutoSize = False
-        Caption = '作成日時(&D)'
+        Caption = #20316#25104#26085#26178'(&D)'
         FocusControl = EditDate
       end
       object LabelCount: TLabel
@@ -238,7 +248,7 @@ object Form1: TForm1
         Height = 12
         Alignment = taCenter
         AutoSize = False
-        Caption = '単語数(&C)'
+        Caption = #21336#35486#25968'(&C)'
         FocusControl = EditCount
       end
       object EditAuthor: TEdit
@@ -259,7 +269,7 @@ object Form1: TForm1
         Anchors = [akLeft, akTop, akRight]
         MaxLength = 64
         TabOrder = 0
-        Text = 'サンプル辞書'
+        Text = #12469#12531#12503#12523#36766#26360
       end
       object EditDate: TEdit
         Left = 75
@@ -270,7 +280,7 @@ object Form1: TForm1
         Font.Charset = SHIFTJIS_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'ＭＳ ゴシック'
+        Font.Name = #65325#65331' '#12468#12471#12483#12463
         Font.Style = []
         ImeMode = imDisable
         MaxLength = 28
@@ -284,7 +294,7 @@ object Form1: TForm1
         Width = 25
         Height = 20
         Anchors = [akTop, akRight]
-        Caption = '今'
+        Caption = #20170
         TabOrder = 3
         OnClick = ButtonNowClick
       end
@@ -304,13 +314,13 @@ object Form1: TForm1
         Width = 40
         Height = 20
         Anchors = [akTop, akRight]
-        Caption = '切詰'
+        Caption = #20999#35440
         TabOrder = 5
         OnClick = ButtonSetCountClick
       end
     end
     object TabError: TTabSheet
-      Caption = 'エラー'
+      Caption = #12456#12521#12540
       ImageIndex = 2
       TabVisible = False
       object MemoError: TMemo
@@ -322,7 +332,7 @@ object Form1: TForm1
         Font.Charset = SHIFTJIS_CHARSET
         Font.Color = clWindowText
         Font.Height = -12
-        Font.Name = 'ＭＳ ゴシック'
+        Font.Name = #65325#65331' '#12468#12471#12483#12463
         Font.Style = []
         ParentFont = False
         ScrollBars = ssBoth
@@ -337,7 +347,7 @@ object Form1: TForm1
         Height = 25
         Align = alTop
         BevelOuter = bvNone
-        Caption = '追加できなかったリスト'
+        Caption = #36861#21152#12391#12365#12394#12363#12387#12383#12522#12473#12488
         TabOrder = 0
       end
     end
@@ -368,19 +378,19 @@ object Form1: TForm1
     Left = 10
     Top = 40
     object KeyFile: TMenuItem
-      Caption = 'ファイル(&F)'
+      Caption = #12501#12449#12452#12523'(&F)'
       object KeyNew: TMenuItem
-        Caption = '新規(&N)'
+        Caption = #26032#35215'(&N)'
         ShortCut = 16462
         OnClick = KeyNewClick
       end
       object KeyOpen: TMenuItem
-        Caption = '開く(&O)'
+        Caption = #38283#12367'(&O)'
         ShortCut = 16463
         OnClick = KeyOpenClick
       end
       object KeySave: TMenuItem
-        Caption = '保存(&S)'
+        Caption = #20445#23384'(&S)'
         ShortCut = 16467
         OnClick = KeySaveClick
       end
@@ -388,74 +398,88 @@ object Form1: TForm1
         Caption = '-'
       end
       object KeyImport: TMenuItem
-        Caption = 'インポート(&I)'
-        OnClick = KeyImportClick
+        Caption = #12452#12531#12509#12540#12488'(&I)'
+        object KeyImportCSV: TMenuItem
+          Caption = 'CSV'#24418#24335'(&C)'
+          OnClick = KeyImportCSVClick
+        end
+        object KeyImportPBX: TMenuItem
+          Caption = 'PBX'#24418#24335'(&P)'
+          OnClick = KeyImportPBXClick
+        end
       end
       object KeyExport: TMenuItem
-        Caption = 'エクスポート(&E)'
-        OnClick = KeyExportClick
+        Caption = #12456#12463#12473#12509#12540#12488'(&E)'
+        object KeyExportCSV: TMenuItem
+          Caption = 'CSV'#24418#24335'(&C)'
+          OnClick = KeyExportCSVClick
+        end
+        object KeyExportPBX: TMenuItem
+          Caption = 'PBX'#24418#24335'(&P)'
+          OnClick = KeyExportPBXClick
+        end
       end
       object KeyBar02: TMenuItem
         Caption = '-'
       end
       object KeyExit: TMenuItem
-        Caption = '終了(&X)'
+        Caption = #32066#20102'(&X)'
         ShortCut = 32883
         OnClick = KeyExitClick
       end
     end
     object KeyEdit: TMenuItem
-      Caption = '編集(&E)'
+      Caption = #32232#38598'(&E)'
       OnClick = KeyEditClick
       object KeyFind: TMenuItem
-        Caption = '読みで検索(&F)'
+        Caption = #35501#12415#12391#26908#32034'(&F)'
         ShortCut = 16454
         OnClick = KeyFindClick
       end
       object KeyFindNext: TMenuItem
-        Caption = '次を検索(&N)'
+        Caption = #27425#12434#26908#32034'(&N)'
         ShortCut = 114
         OnClick = KeyFindNextClick
       end
       object KeyBar: TMenuItem
-        Caption = '伸ばし棒(&B)'
+        Caption = #20280#12400#12375#26834'(&B)'
         object KeyBarAdd: TMenuItem
-          Caption = '母音にして追加(&A)'
+          Caption = #27597#38899#12395#12375#12390#36861#21152'(&A)'
           OnClick = KeyBarAddClick
         end
         object KeyBarChange: TMenuItem
-          Caption = '母音に変更(&C)'
+          Caption = #27597#38899#12395#22793#26356'(&C)'
           OnClick = KeyBarChangeClick
         end
       end
       object KeyDelMulti: TMenuItem
-        Caption = '重複を削除(&M)'
+        Caption = #37325#35079#12434#21066#38500'(&M)'
         OnClick = KeyDelMultiClick
       end
       object KeyBar11: TMenuItem
         Caption = '-'
       end
       object KeyCut: TMenuItem
-        Caption = '切り取り(&T)'
+        Caption = #20999#12426#21462#12426'(&T)'
         OnClick = KeyCutClick
       end
       object KeyCopy: TMenuItem
-        Caption = 'コピー(&C)'
+        Caption = #12467#12500#12540'(&C)'
         OnClick = KeyCopyClick
       end
       object KeyPaste: TMenuItem
-        Caption = '貼り付け(&P)'
+        Caption = #36028#12426#20184#12369'(&P)'
         OnClick = KeyPasteClick
       end
       object KeyDelete: TMenuItem
-        Caption = '削除(&D)'
+        Caption = #21066#38500'(&D)'
         OnClick = KeyDeleteClick
       end
       object KeyBar12: TMenuItem
         Caption = '-'
       end
       object KeySelectAll: TMenuItem
-        Caption = 'すべて選択(&A)'
+        Caption = #12377#12409#12390#36984#25246'(&A)'
         OnClick = KeySelectAllClick
       end
     end
@@ -476,22 +500,22 @@ object Form1: TForm1
     Left = 10
     Top = 130
     object KeyCut2: TMenuItem
-      Caption = '切り取り(&T)'
+      Caption = #20999#12426#21462#12426'(&T)'
       ShortCut = 16472
       OnClick = KeyCutClick
     end
     object KeyCopy2: TMenuItem
-      Caption = 'コピー(&C)'
+      Caption = #12467#12500#12540'(&C)'
       ShortCut = 16451
       OnClick = KeyCopyClick
     end
     object KeyPaste2: TMenuItem
-      Caption = '貼り付け(&P)'
+      Caption = #36028#12426#20184#12369'(&P)'
       ShortCut = 16470
       OnClick = KeyPasteClick
     end
     object KeyDelete2: TMenuItem
-      Caption = '削除(&D)'
+      Caption = #21066#38500'(&D)'
       ShortCut = 46
       OnClick = KeyDeleteClick
     end
@@ -499,7 +523,7 @@ object Form1: TForm1
       Caption = '-'
     end
     object KeySelectAll2: TMenuItem
-      Caption = 'すべて選択(&A)'
+      Caption = #12377#12409#12390#36984#25246'(&A)'
       ShortCut = 16449
       OnClick = KeySelectAllClick
     end

@@ -95,6 +95,13 @@ void __fastcall TForm1::WMDropFiles(TWMDropFiles &Msg)
     try
     {
       lines->LoadFromFile(filename);
+      if (ExtractFileExt(filename).LowerCase() == ".pbx")
+      {
+        while (lines->Count > 0 && lines->Strings[0] != "DicBegin:")
+          lines->Delete(0);
+        if (lines->Count > 0)
+          lines->Delete(0);
+      }
       LoadFromStringList(lines);
     }
     __finally
@@ -122,6 +129,13 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
       try
       {
         lines->LoadFromFile(ParamStr(1));
+        if (ExtractFileExt(ParamStr(1)).LowerCase() == ".pbx")
+        {
+          while (lines->Count > 0 && lines->Strings[0] != "DicBegin:")
+            lines->Delete(0);
+          if (lines->Count > 0)
+            lines->Delete(0);
+        }
         LoadFromStringList(lines);
       }
       __finally
@@ -233,7 +247,7 @@ void __fastcall TForm1::LoadFromFile(AnsiString filename)
     mem->Seek(tempi, soFromBeginning);
     // 辞書
     ListView->Items->BeginUpdate();
-    ListView->SortType = stNone;
+    ListView->SortType = Comctrls::stNone;
     ProgressBar->Max = num;
     AnsiString yomi = "\xFF";
     unsigned char bufy[0x20], leny;
@@ -245,7 +259,7 @@ void __fastcall TForm1::LoadFromFile(AnsiString filename)
 
       // 全体の長さ
       mem->Read(&len1, 1);
-      if (len1 & 0x80) kind = 0;
+      if (len1 & 0x80) kind = 0; // 種類はなし
       len1 &= 0x7F;
 
       // 読みの長さ
@@ -254,14 +268,14 @@ void __fastcall TForm1::LoadFromFile(AnsiString filename)
       // 読み
       mem->Read(buf+1, buf[0] & 0x1F);
       if ((buf[0]&0x1F) != 1 || buf[1] != 0xFF)
-      {
+      { // 読みを読み込む
         leny = buf[0] & 0x1F;
         CopyMemory(bufy, buf+1, leny);
         bufy[leny] = 0;
         yomi = (char*)bufy;
         len1 = len1 - 1 - leny;
       }
-      else
+      else // 読みは前と同じ
         len1 = len1 - 1 - 1;
 
       mem->Read(buf, len1);
@@ -275,14 +289,14 @@ void __fastcall TForm1::LoadFromFile(AnsiString filename)
       buf[len1] = 0;
       goku = (char*)buf;
       if (0x10 <= buf[len1-1] && buf[len1-1] <= 0x1F)
-      { // 最後
+      { // 最後は読みと同じ
         if (buf[len1-1] & 0x08)
           goku = goku.SubString(1, goku.Length() - 1) + ConvertString((char*)(bufy + leny - (buf[len1-1]&0x07) - 1), LCMAP_FULLWIDTH | LCMAP_KATAKANA);
         else
           goku = goku.SubString(1, goku.Length() - 1) + ConvertString((char*)(bufy + leny - (buf[len1-1]&0x07) - 1), LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
       }
       if (0x10 <= buf[0] && buf[0] <= 0x1F)
-      { // 先頭
+      { // 先頭は読みと同じ
         bufy[(buf[0]&0x07)+1] = 0;
         if (buf[0] & 0x08)
           goku = ConvertString((char*)bufy, LCMAP_FULLWIDTH | LCMAP_KATAKANA) + goku.SubString(2, goku.Length() - 1);
@@ -290,22 +304,25 @@ void __fastcall TForm1::LoadFromFile(AnsiString filename)
           goku = ConvertString((char*)bufy, LCMAP_FULLWIDTH | LCMAP_HIRAGANA) + goku.SubString(2, goku.Length() - 1);
       }
 
-      if (opt == 0x0E) // 読みのみの定義？
-        continue;
-
       // 追加
       TListItem *item = ListView->Items->Add();
       item->Caption = yomi;
-      if (opt == 0x08) // 語句をカタカナに
-      {
-        // 半角カナ→全角カナ
-        goku = ConvertString(goku, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
-        item->SubItems->Add(goku);
-      }
-      else if (opt == 0x0A) // 読みをカタカナに
+      if (opt == 0x0A) // 読みをカタカナに
       {
         // 半角→全角
         goku = ConvertString(yomi, LCMAP_FULLWIDTH);
+        item->SubItems->Add(goku);
+      }
+      else if (opt == 0x0E) // 読みをひらがなに
+      {
+        // 半角→全角
+        goku = ConvertString(yomi, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+        item->SubItems->Add(goku);
+      }
+      else if (opt == 0x08) // 語句をカタカナに
+      {
+        // 半角カナ→全角カナ
+        goku = ConvertString(goku, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
         item->SubItems->Add(goku);
       }
       else if (opt == 0x0C) // 語句をひらがなに
@@ -327,7 +344,7 @@ void __fastcall TForm1::LoadFromFile(AnsiString filename)
       ProgressBar->Position = i;
       ProgressBar->Update();
     }
-    ListView->SortType = stData;
+    ListView->SortType = Comctrls::stData;
     //StatusBar->SimpleText = "";
     ProgressBar->Position = 0;
     ListView->Items->EndUpdate();
@@ -385,8 +402,8 @@ void __fastcall TForm1::KeySaveClick(TObject *Sender)
       // ファイルサイズ(保留 0x0004)
       ZeroMemory(buf, 4);
       mem->Write(buf, 4);
-      // ？
-      mem->Write(buf, 4);
+      // 0x00000000 or 0x00000001？
+      mem->Write("\x01\x00\x00\x00", 4);
       // 辞書名
       if (EditName->Text.Length() > 0x40)
         mem->Write(EditName->Text.c_str(), 0x40);
@@ -396,7 +413,7 @@ void __fastcall TForm1::KeySaveClick(TObject *Sender)
         ZeroMemory(buf, 0x40 - EditName->Text.Length());
         mem->Write(buf, 0x40 - EditName->Text.Length());
       }
-      // ？
+      // 内容のばーじょん？0x00000001～5
       mem->Write("\x01\x00\x00\x00", 4);
       // 単語数
       tempi = ListView->Items->Count;
@@ -437,35 +454,123 @@ void __fastcall TForm1::KeySaveClick(TObject *Sender)
           AnsiString goku = ListView->Items->Item[i]->SubItems->Strings[0];
           unsigned char kind = ListView->Items->Item[i]->ImageIndex;
           unsigned char opt = 0x00;
+          int j;
 
-          // 全角かなのみかチェック
+          // 全角かなor全角カナのみかチェック
           AnsiString tgoku = goku;
-          // ひらがな→カタカナ変換＆全角→半角変換
+          // 全角かな,全角カナを半角カナに変換
           tgoku = ConvertString(tgoku, LCMAP_HALFWIDTH | LCMAP_KATAKANA);
-          if (ConvertString(tgoku, LCMAP_FULLWIDTH | LCMAP_HIRAGANA) == goku)
+          // 半角カナのみになったかチェック
+          for (j = tgoku.Length(); j > 0; j --)
           {
-            // 半角カナのみかチェック
-            int j;
-            for (j = tgoku.Length(); j > 0; j --)
-            {
-              unsigned char c = tgoku[j];
-              if (c < 0xA6 || 0xDF < c)
-                break;
+            unsigned char c = tgoku[j];
+            if (c < 0xA5 || 0xDF < c)
+              break;
+          }
+          if (j == 0)
+          { // 全角かな,全角カナのみ
+            if (ConvertString(tgoku, LCMAP_FULLWIDTH | LCMAP_HIRAGANA) == goku)
+            { // 全角かなに戻して元通りなら全角かなのみ
+              if (tgoku == yomi)
+              { // 読みを全角かなにするだけ
+                opt = 0xE0;
+                goku = "";
+              }
+              else
+              { // 語句は全角かな
+                opt = 0xC0;
+                goku = tgoku;
+              }
             }
-            if (j == 0)
-            { // 全角かなのみ
-              opt = 0xC0;
-              goku = tgoku;
+            else if (ConvertString(tgoku, LCMAP_FULLWIDTH | LCMAP_KATAKANA) == goku)
+            { // 全角カナに戻して元通りなら全角カナのみ
+              if (tgoku == yomi)
+              { // 読みを全角カナにするだけ
+                opt = 0xA0;
+                goku = "";
+              }
+              else
+              { // 語句は全角カナ
+                opt = 0x80;
+                goku = tgoku;
+              }
             }
+            // else かなカナ混じり
           }
 
+          AnsiString yomik = ConvertString(yomi, LCMAP_FULLWIDTH | LCMAP_KATAKANA);
+          AnsiString yomih = ConvertString(yomi, LCMAP_FULLWIDTH | LCMAP_HIRAGANA);
+          int yomilen = yomik.Length(), gokulen = goku.Length();
+          // 最後がカタカナ読みと同じかチェック
+          for (j = 1; j < yomilen && j < gokulen; j += 2)
+            if (yomik[yomilen-j] != goku[gokulen-j] || yomik[yomilen-j+1] != goku[gokulen-j+1])
+              break;
+          j = (j - 1) / 2;
+          //if (j > 0 && yomik.SubString(yomilen - j*2 + 1, 2) == "ー")
+          //  j --;
+          if (j > 0)
+          {
+            int k;
+            do
+              k = ConvertString(yomik.SubString(yomilen - j*2 + 1, yomilen), LCMAP_HALFWIDTH).Length() - 1;
+            while (k > 7 && --j > 0);
+            if (j > 0) goku = goku.SubString(1, gokulen - j*2) + AnsiString((char)(0x18 | k));
+          }
+          else
+          {
+            // 最後がひらがな読みと同じかチェック
+            for (j = 1; j < yomilen && j < gokulen; j += 2)
+              if (yomih[yomilen-j] != goku[gokulen-j] || yomih[yomilen-j+1] != goku[gokulen-j+1])
+                break;
+            j = (j - 1) / 2;
+            if (j > 0 && yomik.SubString(yomilen - j*2 + 1, 2) == "ー")
+              j --;
+            if (j > 0)
+            {
+              int k;
+              do
+                k = ConvertString(yomik.SubString(yomilen - j*2 + 1, yomilen), LCMAP_HALFWIDTH).Length() - 1;
+              while (k > 7 && --j > 0);
+              if (j > 0) goku = goku.SubString(1, gokulen - j*2) + AnsiString((char)(0x10 | k));
+            }
+          }
+          // 先頭がカタカナ読みと同じかチェック
+          for (j = 1; j < yomilen && j < goku.Length(); j += 2)
+            if (yomik[j] != goku[j] || yomik[j+1] != goku[j+1])
+              break;
+          j = (j - 1) / 2;
+          if (j)
+          {
+            int k;
+            do
+              k = ConvertString(yomik.SubString(1, j * 2), LCMAP_HALFWIDTH).Length() - 1;
+            while (k > 7 && --j > 0);
+            if (j > 0) goku = AnsiString((char)(0x18 | k)) + goku.SubString(j * 2 + 1, goku.Length());
+          }
+          else
+          {
+            // 先頭がひらがな読みと同じかチェック
+            for (j = 1; j < yomilen && j < goku.Length(); j += 2)
+              if (yomih[j] != goku[j] || yomih[j+1] != goku[j+1])
+                break;
+            j = (j - 1) / 2;
+            if (j)
+            {
+              int k;
+              do
+                k = ConvertString(yomik.SubString(1, j * 2), LCMAP_HALFWIDTH).Length() - 1;
+              while (k > 7 && --j > 0);
+              if (j > 0) goku = AnsiString((char)(0x10 | k)) + goku.SubString(j * 2 + 1, goku.Length());
+            }
+          }
+          
           if (yomi[1] != c)
           { // 読みの１文字目が変わった
             c = yomi[1];
             index->AddObject(yomi, (TObject*)dic->Position);
           }
-          if (i > 0 && yomi == ListView->Items->Item[i-1]->Caption)
-          { // 前と一緒の読み
+          if (i > 0 && yomi.Length() > 1 && yomi == ListView->Items->Item[i-1]->Caption)
+          { // 読みが前と一緒なら省略(但し1バイトより長い時)
             if (kind != 0)
               buf[0] = 1 + 1 + goku.Length() + 1;
             else
@@ -568,7 +673,7 @@ void __fastcall TForm1::LoadFromStringList(TStringList *lines)
     MemoError->Clear();
 
     ListView->Items->BeginUpdate();
-    ListView->SortType = stNone;
+    ListView->SortType = Comctrls::stNone;
     ProgressBar->Max = lines->Count;
     for (int i = 0; i < lines->Count; i ++)
     {
@@ -644,7 +749,7 @@ void __fastcall TForm1::LoadFromStringList(TStringList *lines)
       ProgressBar->Position = i;
       ProgressBar->Update();
     }
-    ListView->SortType = stData;
+    ListView->SortType = Comctrls::stData;
     //StatusBar->SimpleText = "";
     ProgressBar->Position = 0;
     ListView->Items->EndUpdate();
@@ -663,7 +768,7 @@ void __fastcall TForm1::LoadFromStringList(TStringList *lines)
   }
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm1::KeyImportClick(TObject *Sender)
+void __fastcall TForm1::KeyImportCSVClick(TObject *Sender)
 {
   OpenDialog->FileName = "*.csv";
   OpenDialog->Filter = "CSVファイル(*.csv)|*.csv|すべてのファイル(*.*)|*.*";
@@ -674,6 +779,30 @@ void __fastcall TForm1::KeyImportClick(TObject *Sender)
     try
     {
       lines->LoadFromFile(OpenDialog->FileName);
+      LoadFromStringList(lines);
+    }
+    __finally
+    {
+      delete lines;
+    }
+  }
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::KeyImportPBXClick(TObject *Sender)
+{
+  OpenDialog->FileName = "*.pbx";
+  OpenDialog->Filter = "POBox辞書ファイル(*.pbx)|*.pbx|すべてのファイル(*.*)|*.*";
+  OpenDialog->Title = "インポート";
+  if (OpenDialog->Execute())
+  {
+    TStringList *lines = new TStringList();
+    try
+    {
+      lines->LoadFromFile(OpenDialog->FileName);
+      while (lines->Count > 0 && lines->Strings[0] != "DicBegin:")
+        lines->Delete(0);
+      if (lines->Count > 0)
+        lines->Delete(0);
       LoadFromStringList(lines);
     }
     __finally
@@ -705,7 +834,7 @@ void __fastcall TForm1::SaveToStringList(TStringList *lines, bool only)
   }
 }
 //---------------------------------------------------------------------------
-void __fastcall TForm1::KeyExportClick(TObject *Sender)
+void __fastcall TForm1::KeyExportCSVClick(TObject *Sender)
 {
   SaveDialog->FileName = "*.csv";
   SaveDialog->Filter = "CSVファイル(*.csv)|*.csv|すべてのファイル(*.*)|*.*";
@@ -719,7 +848,6 @@ void __fastcall TForm1::KeyExportClick(TObject *Sender)
         return;
 
     TStringList *lines = new TStringList();
-    TStringList *line = new TStringList();
     try
     {
       SaveToStringList(lines);
@@ -728,7 +856,48 @@ void __fastcall TForm1::KeyExportClick(TObject *Sender)
     }
     __finally
     {
-      delete line;
+      delete lines;
+    }
+  }
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::KeyExportPBXClick(TObject *Sender)
+{
+  SaveDialog->FileName = "*.pbx";
+  SaveDialog->Filter = "POBox辞書ファイル(*.pbx)|*.pbx|すべてのファイル(*.*)|*.*";
+  SaveDialog->Title = "エクスポート";
+  if (SaveDialog->Execute())
+  {
+    if (ExtractFileExt(SaveDialog->FileName) == "")
+      SaveDialog->FileName = ChangeFileExt(SaveDialog->FileName, ".pbx");
+    if (FileExists(SaveDialog->FileName))
+      if (Application->MessageBox((SaveDialog->FileName + " ファイルは既に存在します。\n上書きしますか？").c_str(), "エクスポート", MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) == IDNO)
+        return;
+
+    TStringList *lines = new TStringList();
+    try
+    {
+      lines->Add("DicVer:SEMC_01001001");
+      lines->Add("DicChr:Shift_JIS");
+      lines->Add("DicDate:" + StringReplace(EditDate->Text, "/", "", TReplaceFlags()<<rfReplaceAll).SubString(1, 8));
+      lines->Add("DicTitle:" + EditName->Text);
+      AnsiString author = EditAuthor->Text;
+      if (author == "")
+        author = "yasu";
+      else if (author != "yasu" && author.SubString(1, 5) != "yasu/")
+        author = "yasu/" + author;
+      lines->Add("DicMaker:" + author);
+      lines->Add("DicProtect:");
+      lines->Add("DicOperator:au_KDDI");
+      lines->Add("DicSoftware:AADmaker");
+      lines->Add("DicBegin:");
+      for (int i = 0; i < ListView->Items->Count; i ++)
+        lines->Add(ConvertString(ListView->Items->Item[i]->Caption, LCMAP_HIRAGANA | LCMAP_FULLWIDTH) + "\t" + ListView->Items->Item[i]->SubItems->Strings[0]);
+      lines->SaveToFile(SaveDialog->FileName);
+      modify = false;
+    }
+    __finally
+    {
       delete lines;
     }
   }
@@ -755,9 +924,10 @@ bool __fastcall TForm1::CheckInput()
   }
   if (ComboKind->ItemIndex == -1)
   {
-    Application->MessageBox("種類を選択して下さい", "エラー", MB_OK | MB_ICONERROR);
-    ComboKind->SetFocus();
-    return false;
+    ComboKind->ItemIndex = 0;
+    //Application->MessageBox("種類を選択して下さい", "エラー", MB_OK | MB_ICONERROR);
+    //ComboKind->SetFocus();
+    //return false;
   }
 
   // まな→カナ＆全角→半角
@@ -1045,7 +1215,7 @@ void __fastcall TForm1::KeyDelMultiClick(TObject *Sender)
 void __fastcall TForm1::KeyBarAddClick(TObject *Sender)
 {
   ListView->Items->BeginUpdate();
-  ListView->SortType = stNone;
+  ListView->SortType = Comctrls::stNone;
   int n = ListView->Items->Count;
   ProgressBar->Max = n;
   for (int i = 0; i < n; i ++)
@@ -1079,7 +1249,7 @@ void __fastcall TForm1::KeyBarAddClick(TObject *Sender)
   }
   //StatusBar->SimpleText = "";
   ProgressBar->Position = 0;
-  ListView->SortType = stData;
+  ListView->SortType = Comctrls::stData;
   ListView->Items->EndUpdate();
   PageControlChange(Sender);
   modify = modify || (ListView->Items->Count != n);
@@ -1088,7 +1258,7 @@ void __fastcall TForm1::KeyBarAddClick(TObject *Sender)
 void __fastcall TForm1::KeyBarChangeClick(TObject *Sender)
 {
   ListView->Items->BeginUpdate();
-  ListView->SortType = stNone;
+  ListView->SortType = Comctrls::stNone;
   ProgressBar->Max = ListView->Items->Count;
   for (int i = 0; i < ListView->Items->Count; i ++)
   {
@@ -1116,7 +1286,7 @@ void __fastcall TForm1::KeyBarChangeClick(TObject *Sender)
   }
   //StatusBar->SimpleText = "";
   ProgressBar->Position = 0;
-  ListView->SortType = stData;
+  ListView->SortType = Comctrls::stData;
   ListView->Items->EndUpdate();
   PageControlChange(Sender);
 }

@@ -1,4 +1,5 @@
 disposition=caaada0
+device:data/dnld?url=http://casiocafe.jp/ez/servlet/download.DownloadStart?name=dic_kao1;download/dl;.aad&offset=0&count=13282
 
 ADDRESS	SIZE	DATA
 0x0000	0x04	'DATA'
